@@ -1,0 +1,32 @@
+{
+  "name": "nimayneb/ziparchive-base64",
+  "description": "ZipArchive extended with support for UTF-8 encoded strings using base64.",
+  "keywords": [ "ziparchive", "zip", "base64", "utf8", "utf-8", "unicode"],
+  "homepage": "https://github.com/nimayneb/advini",
+  "license": "BSD-3-Clause",
+  "version": "1.0.0",
+  
+  "minimum-stability": "dev",
+
+  "authors": [
+    {
+      "name": "Jan Runte",
+      "email": "github-1601@nimayneb.de",
+      "role": "Developer"
+    }
+  ],
+
+  "require": {
+    "php": ">5.4.10"
+  },
+
+  "require-dev": {
+    "phpunit/phpunit": "4.8.*"
+  },
+
+  "autoload": {
+    "psr-4": {
+      "JBR\\ZipArchive64\\": "src/"
+    }
+  }
+}
