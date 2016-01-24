@@ -35,9 +35,9 @@ class ZipArchive64Test extends PHPUnit_Framework_TestCase {
 
 	public function testCreateZipArchive() {
 		$zip = new ZipArchive64();
-		$zip->open('tests/res/test.zip', ZipArchive::OVERWRITE);
+		$zip->open('Tests/res/test.zip', ZipArchive::OVERWRITE);
 
-		foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator('tests/res/example')) as $filename) {
+		foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator('Tests/res/example')) as $filename) {
 			if (true === $filename->isDir()) {
 				continue;
 			}
@@ -48,8 +48,8 @@ class ZipArchive64Test extends PHPUnit_Framework_TestCase {
 		$zip->close();
 
 		$zip = new ZipArchive64();
-		$zip->open('test.zip');
-		$zip->extractTo('tests/res/result');
+		$zip->open('Tests/res/test.zip');
+		$zip->extractTo('Tests/res/result');
 		$zip->close();
 	}
 }
