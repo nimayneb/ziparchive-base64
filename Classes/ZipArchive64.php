@@ -56,7 +56,11 @@ class ZipArchive64 extends ZipArchive {
 	 * @return string
 	 */
 	protected function getEncodedBase64($value) {
-		return str_replace(['+', '/'], ['-', '_'], base64_encode($value));
+		return sprintf(
+			'%s#%s',
+			crc32($value),
+			str_replace(['+', '/'], ['-', '_'], base64_encode($value))
+		);
 	}
 
 	/**
@@ -65,7 +69,17 @@ class ZipArchive64 extends ZipArchive {
 	 * @return string
 	 */
 	protected function getDecodedBase64($value) {
-		return base64_decode(str_replace(['+', '/'], ['-', '_'], $value));
+		if (FALSE === strpos($value, '#')) {
+			return $value;
+		}
+
+		list($hash, $encodedName) = explode('#', $value);
+		$name = base64_decode(str_replace(['-', '_'], ['+', '/'], $encodedName));
+		if ($hash !== crc32($name)) {
+			return $value;
+		}
+
+		return $value;
 	}
 
 	/**
