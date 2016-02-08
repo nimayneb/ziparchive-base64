@@ -23,38 +23,23 @@
  *  This copyright notice MUST APPEAR in all copies of the script!
  **********************************************************************/
 
-require_once(__DIR__ . '/../../vendor/autoload.php');
-
-use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-$console = new Application();
-$console->setName('ZipArchive64');
+/**
+ * Class ExtractCommand
+ */
+class ExtractCommand extends Command {
 
-$composerJson = json_decode(file_get_contents(__DIR__ . '/../../composer.json'), true);
-$console->setVersion($composerJson['version']);
-$console->register('create')
-	->setDefinition([
-		new InputArgument('source', InputArgument::REQUIRED, 'Source file'),
-		new InputArgument('target', InputArgument::OPTIONAL, 'Target dir')
-	])
-	->setDescription('Create base64 encoded file and path names')
-	->setCode(function (InputInterface $input, OutputInterface $output) {
-		$source = $input->getArgument('source');
-		$target = $input->getArgument('target');
-
-	})
-;
-
-$console->register('extract')
-	->setDefinition([
-		new InputArgument('source', InputArgument::REQUIRED, 'Source file'),
-		new InputArgument('target', InputArgument::OPTIONAL, 'Target dir')
-	])
-	->setDescription('Extract base64 encoded file and path names')
-	->setCode(function (InputInterface $input, OutputInterface $output) {
+	/**
+	 * @param InputInterface  $input
+	 * @param OutputInterface $output
+	 *
+	 * @return int|null|void
+	 */
+	protected function execute(InputInterface $input, OutputInterface $output) {
 		$source = $input->getArgument('source');
 
 		if ('/' !== $source{0}) {
@@ -89,7 +74,19 @@ $console->register('extract')
 			$output->writeln(sprintf('Cannot extract to <%s>', $target));
 			exit;
 		}
-	})
-;
+	}
 
-$console->run();
+	/**
+	 *
+	 */
+	protected function configure() {
+		$this
+            ->setName('extract')
+            ->setDescription('Extract base64 encoded file and path names')
+			->setDefinition([
+				new InputArgument('source', InputArgument::REQUIRED, 'Source file'),
+				new InputArgument('target', InputArgument::OPTIONAL, 'Target dir')
+			])
+        ;
+	}
+}

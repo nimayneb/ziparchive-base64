@@ -1,0 +1,13 @@
+#!/usr/bin/env php
+<?php
+
+if ('cli' !== PHP_SAPI) {
+    echo sprintf("Warning: Zip64 should be invoked via the CLI version of PHP, not the %s SAPI\n\n", PHP_SAPI);
+}
+
+require __DIR__ . '/../Classes/bootstrap.php';
+
+use Composer\Console\Application;
+
+$application = new Application();
+$application->run();
