@@ -29,5 +29,7 @@
     "psr-4": {
       "JBR\\ZipArchive64\\": "Classes/"
     }
-  }
+  },
+
+  "bin": "bin/zip64"
 }
