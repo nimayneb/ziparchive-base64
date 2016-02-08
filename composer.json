@@ -31,5 +31,7 @@
     }
   },
 
-  "bin": "bin/zip64"
+  "bin": [
+    "bin/zip64"
+  ]
 }
