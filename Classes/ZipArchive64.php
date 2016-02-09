@@ -69,15 +69,15 @@ class ZipArchive64 extends ZipArchive {
 	 * @return string
 	 */
 	protected function getDecodedBase64($value) {
-		if (FALSE === strpos($value, '#')) {
-			return $value;
+		if (false !== strpos($value, '#')) {
+			list($hash, $encodedName) = explode('#', $value);
+			$name = base64_decode(str_replace(['-', '_'], ['+', '/'], $encodedName));
+
+			if (intval($hash) === crc32($name)) {
+				$value = $name;
+			}
 		}
 
-		list($hash, $encodedName) = explode('#', $value);
-		$name = base64_decode(str_replace(['-', '_'], ['+', '/'], $encodedName));
-		if ($hash !== crc32($name)) {
-			return $value;
-		}
 
 		return $value;
 	}
@@ -203,22 +203,9 @@ class ZipArchive64 extends ZipArchive {
 		$renamedFiles = [];
 
 		foreach ($extractedFiles as $encodedFileName) {
-			$paths = explode('/', $encodedFileName);
-
-			$decodedFileName = [];
-			foreach ($paths as $path) {
-				$decodedString = base64_decode($path, false);
-
-				if (false === $decodedString) {
-					return $this->errorHandler(sprintf('Invalid base64 string for file <%s>!', $path));
-				}
-
-				$decodedFileName[] = $decodedString;
-			}
-
-			$fileName = implode('/', $decodedFileName);
+			$decodedFileName = $this->getBase64DecodedFilePath($encodedFileName);
 			$oldPaths = explode('/', $encodedFileName);
-			$newPaths = explode('/', $fileName);
+			$newPaths = explode('/', $decodedFileName);
 			$checkPath = $destination;
 
 			foreach ($oldPaths as $index => $path) {
