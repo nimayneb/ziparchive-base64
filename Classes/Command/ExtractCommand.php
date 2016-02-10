@@ -26,6 +26,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  ************************************************************************************/
 
+use JBR\ZipArchive64\ZipArchive64;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -46,7 +47,7 @@ class ExtractCommand extends Command {
 		$source = $input->getArgument('source');
 
 		if ('/' !== $source{0}) {
-			$source = getcwd() . $source;
+			$source = getcwd() . '/' . $source;
 		}
 
 		if (false === is_file($source)) {
@@ -59,7 +60,7 @@ class ExtractCommand extends Command {
 		if (true === empty($target)) {
 			$target = getcwd();
 		} elseif ('/' !== $target{0}) {
-			$target = getcwd() . $target;
+			$target = getcwd() . '/' . $target;
 		}
 
 		if (false === is_dir($target)) {
@@ -77,6 +78,8 @@ class ExtractCommand extends Command {
 			$output->writeln(sprintf('Cannot extract to <%s>', $target));
 			exit;
 		}
+
+		$zip->close();
 	}
 
 	/**

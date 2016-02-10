@@ -26,6 +26,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  ************************************************************************************/
 
+use JBR\ZipArchive64\Command\CreateCommand;
 use JBR\ZipArchive64\Command\ExtractCommand;
 use Symfony\Component\Console\Application as BaseApplication;
 use Symfony\Component\Console\Input\InputArgument;
@@ -53,6 +54,7 @@ class Application extends BaseApplication {
 	 */
 	protected function getDefaultCommands() {
 		$commands = parent::getDefaultCommands();
+		$commands[] = new CreateCommand();
 		$commands[] = new ExtractCommand();
 
 		return $commands;
