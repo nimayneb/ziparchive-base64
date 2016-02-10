@@ -152,8 +152,8 @@ class CreateCommand extends Command {
 					'Specifies the target file that you want as packed archive'
 				),
 				new InputOption(
-					'append', 'a', InputOption::VALUE_NONE,
-					'Append files to existing archive'
+					'update', 'u', InputOption::VALUE_NONE,
+					'Update existing or add new files into archive'
 				),
 				new InputOption(
 					'recursive', 'r', InputOption::VALUE_NONE,
