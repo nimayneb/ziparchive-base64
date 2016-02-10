@@ -76,8 +76,8 @@ class CreateCommand extends Command {
 		}
 
 		$zip = new ZipArchive64();
-		$append = $input->getOption('append');
-		if (false === $zip->open($target, $this->getArchiveMode($append))) {
+		$update = $input->getOption('update');
+		if (false === $zip->open($target, $this->getArchiveMode($update))) {
 			$output->writeln(sprintf('Cannot open <%s>', $source));
 			exit;
 		}
@@ -85,14 +85,21 @@ class CreateCommand extends Command {
 		$recursive = $input->getOption('recursive');
 		$directory = $this->getDirectoryIterator($source, (false === empty($recursive)));
 
+		$i = 0;
 		foreach ($directory as $fileInfo /** @var SplFileInfo $fileInfo */) {
 			if (true === $fileInfo->isDir()) {
 				continue;
 			}
 
+			$i++;
 			$file = $fileInfo->getRealPath();
 			$truncate = $input->getOption('truncate');
 			$localName = $this->getLocalName($file, (false === empty($truncate)));
+
+			$verbose = $input->getOption('verbose');
+			if (false === empty($verbose)) {
+				$output->writeln(sprintf('<%s> Add "%s"', str_pad($i, 4, '0', STR_PAD_LEFT), $localName));
+			}
 
 			if (false === $zip->addFile($file, $localName)) {
 				$output->writeln(sprintf('Cannot add source file <%s>', $file));
@@ -168,14 +175,14 @@ class CreateCommand extends Command {
 	}
 
 	/**
-	 * @param boolean $append
+	 * @param boolean $update
 	 *
 	 * @return integer
 	 */
-	private function getArchiveMode($append) {
+	private function getArchiveMode($update) {
 		$option = ZipArchive64::OVERWRITE;
 
-		if (true === $append) {
+		if (true === $update) {
 			$option = ZipArchive64::CREATE;
 		}
 
