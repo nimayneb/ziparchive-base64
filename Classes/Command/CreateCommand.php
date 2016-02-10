@@ -26,7 +26,11 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  ************************************************************************************/
 
+use DirectoryIterator;
 use JBR\ZipArchive64\ZipArchive64;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
+use SplFileInfo;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -66,26 +70,53 @@ class CreateCommand extends Command {
 			$target = getcwd() . '/' . $target;
 		}
 
-		if (false === is_dir($target)) {
-			$output->writeln(sprintf('Cannot extract to <%s>', $target));
+		if (false === is_dir(dirname($target))) {
+			$output->writeln(sprintf('Cannot create archive to <%s>', dirname($target)));
 			exit;
 		}
 
 		$zip = new ZipArchive64();
-		if (false === $zip->open($source, ZipArchive64::OVERWRITE)) {
+		$append = $input->getOption('append');
+		if (false === $zip->open($target, $this->getArchiveMode($append))) {
 			$output->writeln(sprintf('Cannot open <%s>', $source));
 			exit;
 		}
 
-		foreach ($files as $file) {
-			$truncate = $input->getArgument('truncate-cwd');
-			if (false === $zip->addFile($file, $this->getLocalName($file, (false === empty($truncate))))) {
+		$recursive = $input->getOption('recursive');
+		$directory = $this->getDirectoryIterator($source, (false === empty($recursive)));
+
+		foreach ($directory as $fileInfo /** @var SplFileInfo $fileInfo */) {
+			if (true === $fileInfo->isDir()) {
+				continue;
+			}
+
+			$file = $fileInfo->getRealPath();
+			$truncate = $input->getOption('truncate');
+			$localName = $this->getLocalName($file, (false === empty($truncate)));
+
+			if (false === $zip->addFile($file, $localName)) {
 				$output->writeln(sprintf('Cannot add source file <%s>', $file));
 				exit;
 			}
 		}
 
 		$zip->close();
+	}
+
+	/**
+	 * @param string $source
+	 * @param bool $recursive
+	 *
+	 * @return DirectoryIterator
+	 */
+	protected function getDirectoryIterator($source, $recursive = false) {
+		if (true === $recursive) {
+			$directory = new RecursiveDirectoryIterator($source);
+
+			return new RecursiveIteratorIterator($directory);
+		}
+
+		return new DirectoryIterator($source);
 	}
 
 	/**
@@ -121,14 +152,33 @@ class CreateCommand extends Command {
 					'Specifies the target file that you want as packed archive'
 				),
 				new InputOption(
-					'recursive', 'r', InputOption::VALUE_OPTIONAL,
-					'Recursively compress files in directory', false
+					'append', 'a', InputOption::VALUE_NONE,
+					'Append files to existing archive'
 				),
 				new InputOption(
-					'truncate-cwd', 't',  InputOption::VALUE_OPTIONAL,
-					'Truncate current working directory from archive', false
+					'recursive', 'r', InputOption::VALUE_NONE,
+					'Recursively compress files in directory'
+				),
+				new InputOption(
+					'truncate', 't',  InputOption::VALUE_NONE,
+					'Truncate current working directory from archive'
 				)
 			])
         ;
+	}
+
+	/**
+	 * @param boolean $append
+	 *
+	 * @return integer
+	 */
+	private function getArchiveMode($append) {
+		$option = ZipArchive64::OVERWRITE;
+
+		if (true === $append) {
+			$option = ZipArchive64::CREATE;
+		}
+
+		return $option;
 	}
 }
