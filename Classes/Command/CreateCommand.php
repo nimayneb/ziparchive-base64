@@ -156,7 +156,7 @@ class CreateCommand extends Command {
 				),
 				new InputArgument(
 					'target', InputArgument::OPTIONAL,
-					'Specifies the target file that you want as packed archive'
+					'Specifies the target archive file in which all files are to be packed.'
 				),
 				new InputOption(
 					'update', 'u', InputOption::VALUE_NONE,
@@ -164,7 +164,7 @@ class CreateCommand extends Command {
 				),
 				new InputOption(
 					'recursive', 'r', InputOption::VALUE_NONE,
-					'Recursively compress files in directory'
+					'Recursively find files in source directory'
 				),
 				new InputOption(
 					'truncate', 't',  InputOption::VALUE_NONE,
