@@ -4,7 +4,7 @@
  * Copyright (c) 2016, Jan Runte
  * All rights reserved.
  *
- * Redistributionv and use in source and binary forms, with or without modification,
+ * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
  *
  * 1. Redistributions  of source code must retain the above copyright notice,  this
@@ -110,18 +110,23 @@ class CreateCommand extends Command {
 		$this
 			->setName('create')
 			->setDescription('Create archive with base64 encoded file and path names')
+
 			->setDefinition([
 				new InputArgument(
-					'source', InputArgument::REQUIRED, 'Specifies the source path which you like to pack.'
+					'source', InputArgument::REQUIRED,
+					'Specifies the source path which you like to pack.'
 				),
 				new InputArgument(
-					'target', InputArgument::OPTIONAL, 'Specifies the target file that you want as packed archive'
+					'target', InputArgument::OPTIONAL,
+					'Specifies the target file that you want as packed archive'
 				),
 				new InputOption(
-					'recursive', 'r', InputOption::VALUE_OPTIONAL, 'Recursively compress files in directory', false
+					'recursive', 'r', InputOption::VALUE_OPTIONAL,
+					'Recursively compress files in directory', false
 				),
 				new InputOption(
-					'truncate-cwd', 't',  InputOption::VALUE_OPTIONAL, 'Truncate current working directory from archive', false
+					'truncate-cwd', 't',  InputOption::VALUE_OPTIONAL,
+					'Truncate current working directory from archive', false
 				)
 			])
         ;
