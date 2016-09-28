@@ -46,8 +46,9 @@ class ZipArchive64 extends ZipArchive {
 	 */
 	public function open($filename, $flags = null) {
 		$this->currentFile = $filename;
+        $filename = sprintf('%s/%s', realpath(dirname($filename)), basename($filename));
 
-		return ErrorMessages::assert(parent::open(realpath($filename), $flags));
+		return ErrorMessages::assert(parent::open($filename, $flags));
 	}
 
 	/**
