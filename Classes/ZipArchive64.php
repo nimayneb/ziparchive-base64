@@ -47,7 +47,7 @@ class ZipArchive64 extends ZipArchive {
 	public function open($filename, $flags = null) {
 		$this->currentFile = $filename;
 
-		return ErrorMessages::assert(parent::open($filename, $flags));
+		return ErrorMessages::assert(parent::open(realpath($filename), $flags));
 	}
 
 	/**
