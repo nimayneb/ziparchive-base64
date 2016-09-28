@@ -355,7 +355,15 @@ class ZipArchive64 extends ZipArchive {
 		return $result;
 	}
 
-	/**
+    /**
+     * @return bool
+     */
+    public function close()
+    {
+        return ErrorMessages::assert(parent::close());
+    }
+
+    /**
 	 * @param string $name
 	 *
 	 * @return bool
