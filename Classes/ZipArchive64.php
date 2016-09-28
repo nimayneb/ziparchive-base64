@@ -26,6 +26,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  ************************************************************************************/
 
+use Exception;
 use ZipArchive;
 
 /**
@@ -38,15 +39,22 @@ class ZipArchive64 extends ZipArchive {
 	 */
 	protected $currentFile;
 
-	/**
-	 * @param string $filename
-	 * @param string $flags
-	 *
-	 * @return mixed
-	 */
+    /**
+     * @param string $filename
+     * @param string $flags
+     *
+     * @throws Exception
+     * @return mixed
+     */
 	public function open($filename, $flags = null) {
 		$this->currentFile = $filename;
-        $filename = sprintf('%s/%s', realpath(dirname($filename)), basename($filename));
+
+        $path = realpath(dirname($filename));
+        if ((true === empty($path)) || (false === is_dir($path))) {
+            throw new Exception(sprintf('Cannot create zip file in a none directory <%s>', dirname($filename)));
+        }
+
+        $filename = sprintf('%s/%s', $path, basename($filename));
 
 		return ErrorMessages::assert(parent::open($filename, $flags));
 	}
