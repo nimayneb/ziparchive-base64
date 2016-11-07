@@ -42,150 +42,153 @@ use Symfony\Component\Console\Output\OutputInterface;
  *
  * @package JBR\ZipArchive64
  */
-class CreateCommand extends Command {
+class CreateCommand extends Command
+{
 
-	/**
-	 * @param InputInterface  $input
-	 * @param OutputInterface $output
-	 *
-	 * @return int|null|void
-	 */
-	protected function execute(InputInterface $input, OutputInterface $output) {
-		$source = $input->getArgument('source');
+    /**
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     *
+     * @return int|null|void
+     */
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
+        $source = $input->getArgument('source');
 
-		if ('/' !== $source{0}) {
-			$source = getcwd() . '/' . $source;
-		}
+        if ('/' !== $source{0}) {
+            $source = getcwd() . '/' . $source;
+        }
 
-		if (false === is_dir($source)) {
-			$output->writeln(sprintf('Cannot create from <%s>', $source));
-			exit;
-		}
+        if (false === is_dir($source)) {
+            $output->writeln(sprintf('Cannot create from <%s>', $source));
+            exit;
+        }
 
-		$target = $input->getArgument('target');
+        $target = $input->getArgument('target');
 
-		if (true === empty($target)) {
-			$target = getcwd();
-		} elseif ('/' !== $target{0}) {
-			$target = getcwd() . '/' . $target;
-		}
+        if (true === empty($target)) {
+            $target = getcwd();
+        } elseif ('/' !== $target{0}) {
+            $target = getcwd() . '/' . $target;
+        }
 
-		if (false === is_dir(dirname($target))) {
-			$output->writeln(sprintf('Cannot create archive to <%s>', dirname($target)));
-			exit;
-		}
+        if (false === is_dir(dirname($target))) {
+            $output->writeln(sprintf('Cannot create archive to <%s>', dirname($target)));
+            exit;
+        }
 
-		$zip = new ZipArchive64();
-		$update = $input->getOption('update');
-		if (false === $zip->open($target, $this->getArchiveMode($update))) {
-			$output->writeln(sprintf('Cannot open <%s>', $source));
-			exit;
-		}
+        $zip = new ZipArchive64();
+        $update = $input->getOption('update');
+        if (false === $zip->open($target, $this->getArchiveMode($update))) {
+            $output->writeln(sprintf('Cannot open <%s>', $source));
+            exit;
+        }
 
-		$recursive = $input->getOption('recursive');
-		$directory = $this->getDirectoryIterator($source, (false === empty($recursive)));
+        $recursive = $input->getOption('recursive');
+        $directory = $this->getDirectoryIterator($source, (false === empty($recursive)));
 
-		$i = 0;
-		foreach ($directory as $fileInfo /** @var SplFileInfo $fileInfo */) {
-			if (true === $fileInfo->isDir()) {
-				continue;
-			}
+        $i = 0;
+        foreach ($directory as $fileInfo/** @var SplFileInfo $fileInfo */) {
+            if (true === $fileInfo->isDir()) {
+                continue;
+            }
 
-			$i++;
-			$file = $fileInfo->getRealPath();
-			$truncate = $input->getOption('truncate');
-			$localName = $this->getLocalName($file, (false === empty($truncate)));
+            $i++;
+            $file = $fileInfo->getRealPath();
+            $truncate = $input->getOption('truncate');
+            $localName = $this->getLocalName($file, (false === empty($truncate)));
 
-			$verbose = $input->getOption('verbose');
-			if (false === empty($verbose)) {
-				$output->writeln(sprintf('<%s> Add "%s"', str_pad($i, 4, '0', STR_PAD_LEFT), $localName));
-			}
+            $verbose = $input->getOption('verbose');
+            if (false === empty($verbose)) {
+                $output->writeln(sprintf('<%s> Add "%s"', str_pad($i, 4, '0', STR_PAD_LEFT), $localName));
+            }
 
-			if (false === $zip->addFile($file, $localName)) {
-				$output->writeln(sprintf('Cannot add source file <%s>', $file));
-				exit;
-			}
-		}
+            if (false === $zip->addFile($file, $localName)) {
+                $output->writeln(sprintf('Cannot add source file <%s>', $file));
+                exit;
+            }
+        }
 
-		$zip->close();
-	}
+        $zip->close();
+    }
 
-	/**
-	 * @param string $source
-	 * @param bool $recursive
-	 *
-	 * @return DirectoryIterator
-	 */
-	protected function getDirectoryIterator($source, $recursive = false) {
-		if (true === $recursive) {
-			$directory = new RecursiveDirectoryIterator($source);
+    /**
+     * @param boolean $update
+     *
+     * @return integer
+     */
+    private function getArchiveMode($update)
+    {
+        $option = ZipArchive64::OVERWRITE;
 
-			return new RecursiveIteratorIterator($directory);
-		}
+        if (true === $update) {
+            $option = ZipArchive64::CREATE;
+        }
 
-		return new DirectoryIterator($source);
-	}
+        return $option;
+    }
 
-	/**
-	 * @param string $file
-	 * @param boolean $input
-	 *
-	 * @return string
-	 */
-	protected function getLocalName($file, $truncate = false) {
-		if (true === $truncate) {
-			$file = str_replace(getcwd(), '', $file);
-		}
+    /**
+     * @param string $source
+     * @param bool $recursive
+     *
+     * @return DirectoryIterator
+     */
+    protected function getDirectoryIterator($source, $recursive = false)
+    {
+        if (true === $recursive) {
+            $directory = new RecursiveDirectoryIterator($source);
 
-		return $file;
-	}
+            return new RecursiveIteratorIterator($directory);
+        }
 
+        return new DirectoryIterator($source);
+    }
 
-	/**
-	 *
-	 */
-	protected function configure() {
-		$this
-			->setName('create')
-			->setDescription('Create archive with base64 encoded file and path names')
+    /**
+     * @param string $file
+     * @param boolean $input
+     *
+     * @return string
+     */
+    protected function getLocalName($file, $truncate = false)
+    {
+        if (true === $truncate) {
+            $file = str_replace(getcwd(), '', $file);
+        }
 
-			->setDefinition([
-				new InputArgument(
-					'source', InputArgument::REQUIRED,
-					'Specifies the source path which you like to pack.'
-				),
-				new InputArgument(
-					'target', InputArgument::OPTIONAL,
-					'Specifies the target archive file in which all files are to be packed.'
-				),
-				new InputOption(
-					'update', 'u', InputOption::VALUE_NONE,
-					'Update existing or add new files into archive'
-				),
-				new InputOption(
-					'recursive', 'r', InputOption::VALUE_NONE,
-					'Recursively find files in source directory'
-				),
-				new InputOption(
-					'truncate', 't',  InputOption::VALUE_NONE,
-					'Truncate current working directory from archive'
-				)
-			])
-        ;
-	}
+        return $file;
+    }
 
-	/**
-	 * @param boolean $update
-	 *
-	 * @return integer
-	 */
-	private function getArchiveMode($update) {
-		$option = ZipArchive64::OVERWRITE;
-
-		if (true === $update) {
-			$option = ZipArchive64::CREATE;
-		}
-
-		return $option;
-	}
+    /**
+     *
+     */
+    protected function configure()
+    {
+        $this
+            ->setName('create')
+            ->setDescription('Create archive with base64 encoded file and path names')
+            ->setDefinition([
+                new InputArgument(
+                    'source', InputArgument::REQUIRED,
+                    'Specifies the source path which you like to pack.'
+                ),
+                new InputArgument(
+                    'target', InputArgument::OPTIONAL,
+                    'Specifies the target archive file in which all files are to be packed.'
+                ),
+                new InputOption(
+                    'update', 'u', InputOption::VALUE_NONE,
+                    'Update existing or add new files into archive'
+                ),
+                new InputOption(
+                    'recursive', 'r', InputOption::VALUE_NONE,
+                    'Recursively find files in source directory'
+                ),
+                new InputOption(
+                    'truncate', 't', InputOption::VALUE_NONE,
+                    'Truncate current working directory from archive'
+                )
+            ]);
+    }
 }

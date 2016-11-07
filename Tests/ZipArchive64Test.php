@@ -31,25 +31,27 @@ use JBR\ZipArchive64\ZipArchive64;
 /**
  *
  */
-class ZipArchive64Test extends PHPUnit_Framework_TestCase {
+class ZipArchive64Test extends PHPUnit_Framework_TestCase
+{
 
-	public function testCreateZipArchive() {
-		$zip = new ZipArchive64();
-		$zip->open('Tests/res/test.zip', ZipArchive::OVERWRITE);
+    public function testCreateZipArchive()
+    {
+        $zip = new ZipArchive64();
+        $zip->open('Tests/res/test.zip', ZipArchive::OVERWRITE);
 
-		foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator('Tests/res/example')) as $filename) {
-			if (true === $filename->isDir()) {
-				continue;
-			}
+        foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator('Tests/res/example')) as $filename) {
+            if (true === $filename->isDir()) {
+                continue;
+            }
 
-			$zip->addFile($filename);
-		}
+            $zip->addFile($filename);
+        }
 
-		$zip->close();
+        $zip->close();
 
-		$zip = new ZipArchive64();
-		$zip->open('Tests/res/test.zip');
-		$zip->extractTo('Tests/res/result');
-		$zip->close();
-	}
+        $zip = new ZipArchive64();
+        $zip->open('Tests/res/test.zip');
+        $zip->extractTo('Tests/res/result');
+        $zip->close();
+    }
 }

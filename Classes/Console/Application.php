@@ -29,34 +29,34 @@
 use JBR\ZipArchive64\Command\CreateCommand;
 use JBR\ZipArchive64\Command\ExtractCommand;
 use Symfony\Component\Console\Application as BaseApplication;
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * Class Application
  *
  * @package JBR\ZipArchive64
  */
-class Application extends BaseApplication {
+class Application extends BaseApplication
+{
 
-	/**
-	 * @param string $name
-	 * @param string $version
-	 */
-	public function __construct($name = 'UNKNOWN', $version = 'UNKNOWN') {
-		$composer = json_decode(file_get_contents(__DIR__ . '/../../composer.json'), true);
-		parent::__construct('zip64', $composer['version']);
-	}
+    /**
+     * @param string $name
+     * @param string $version
+     */
+    public function __construct($name = 'UNKNOWN', $version = 'UNKNOWN')
+    {
+        $composer = json_decode(file_get_contents(__DIR__ . '/../../composer.json'), true);
+        parent::__construct('zip64', $composer['version']);
+    }
 
-	/**
-	 * @return array|\Symfony\Component\Console\Command\Command[]
-	 */
-	protected function getDefaultCommands() {
-		$commands = parent::getDefaultCommands();
-		$commands[] = new CreateCommand();
-		$commands[] = new ExtractCommand();
+    /**
+     * @return array|\Symfony\Component\Console\Command\Command[]
+     */
+    protected function getDefaultCommands()
+    {
+        $commands = parent::getDefaultCommands();
+        $commands[] = new CreateCommand();
+        $commands[] = new ExtractCommand();
 
-		return $commands;
-	}
+        return $commands;
+    }
 }

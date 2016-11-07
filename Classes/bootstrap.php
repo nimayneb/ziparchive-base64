@@ -6,7 +6,8 @@
  *
  * @return bool
  */
-function includeFileIfExists($file) {
+function includeFileIfExists($file)
+{
     return (true === file_exists($file)) ? include_once $file : false;
 }
 
