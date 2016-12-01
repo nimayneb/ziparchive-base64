@@ -58,7 +58,7 @@ class ZipArchive64 extends ZipArchive
 
         $filename = sprintf('%s/%s', $path, basename($filename));
 
-        return ErrorMessages::assert(parent::open($filename, $flags));
+        return ErrorMessages::assert(parent::open($filename, $flags), $filename);
     }
 
     /**

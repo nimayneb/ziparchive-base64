@@ -44,32 +44,35 @@ class ErrorMessages
     ];
 
     /**
+     * @param stgring $filename
      * @param mixed $result
      *
-     * @throws Exception
      * @return mixed
+     * @throws Exception
      */
-    public static function assert($result)
+    public static function assert($filename, $result)
     {
-        if (true === is_int($result)) {
-            throw new Exception(static::message($result));
+        if (true === is_integer($result)) {
+            throw new Exception(static::message($filename, $result));
         }
 
         return $result;
     }
 
     /**
+     * @param string $filename
      * @param integer $code
+     *
      * @return string
      */
-    protected static function message($code)
+    protected static function message($filename, $code)
     {
-        $code = sprintf('An unknown error has occurred (%u)', $code);
+        $code = sprintf('An unknown error (%u) has occurred for file <%s>', $code, $filename);
 
-        if (true === isset(static::$messages[$code])) {
-            $code = static::$messages[$code];
+        if (true === isset(static::$messages[(integer) $code])) {
+            $code = static::$messages[(integer) $code];
         }
 
-        return $code;
+        return sprintf('%s for file <%s>', $code, $filename);
     }
 }
