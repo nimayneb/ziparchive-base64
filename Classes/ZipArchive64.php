@@ -58,7 +58,7 @@ class ZipArchive64 extends ZipArchive
 
         $filename = sprintf('%s/%s', $path, basename($filename));
 
-        return ErrorMessages::assert(parent::open($filename, $flags), $filename);
+        return ErrorMessages::assert($filename, parent::open($filename, $flags));
     }
 
     /**
@@ -68,7 +68,7 @@ class ZipArchive64 extends ZipArchive
      */
     public function addEmptyDir($dirname)
     {
-        return ErrorMessages::assert(parent::addEmptyDir($this->getBase64EncodedFilePath($dirname)));
+        return ErrorMessages::assert($dirname, parent::addEmptyDir($this->getBase64EncodedFilePath($dirname)));
     }
 
     /**
@@ -108,7 +108,7 @@ class ZipArchive64 extends ZipArchive
      */
     public function addFromString($localname, $contents)
     {
-        return ErrorMessages::assert(parent::addFromString($this->getBase64EncodedFilePath($localname), $contents));
+        return ErrorMessages::assert($localname, parent::addFromString($this->getBase64EncodedFilePath($localname), $contents));
     }
 
     /**
@@ -126,6 +126,7 @@ class ZipArchive64 extends ZipArchive
         }
 
         return ErrorMessages::assert(
+            $filename,
             parent::addFile($filename, $this->getBase64EncodedFilePath($localname), $start, $length)
         );
     }
@@ -145,7 +146,7 @@ class ZipArchive64 extends ZipArchive
         for ($i = 0; $i < $this->numFiles; $i++) {
             $encodedFileName = $this->getNameIndex($i);
 
-            $result = ErrorMessages::assert(parent::extractTo($destination, $encodedFileName));
+            $result = ErrorMessages::assert($encodedFileName, parent::extractTo($destination, $encodedFileName));
 
             if (false === $result) {
                 return $this->errorHandler(
@@ -262,6 +263,7 @@ class ZipArchive64 extends ZipArchive
     public function renameName($name, $newname)
     {
         return ErrorMessages::assert(
+            $name,
             parent::renameName($this->getBase64EncodedFilePath($name), $this->getBase64EncodedFilePath($newname))
         );
     }
@@ -273,7 +275,7 @@ class ZipArchive64 extends ZipArchive
      */
     public function deleteName($name)
     {
-        return ErrorMessages::assert(parent::deleteName($this->getBase64EncodedFilePath($name)));
+        return ErrorMessages::assert($name, parent::deleteName($this->getBase64EncodedFilePath($name)));
     }
 
     /**
@@ -285,7 +287,7 @@ class ZipArchive64 extends ZipArchive
      */
     public function getFromName($name, $length = 0, $flags = null)
     {
-        return ErrorMessages::assert(parent::getFromName($this->getBase64EncodedFilePath($name), $length, $flags));
+        return ErrorMessages::assert($name, parent::getFromName($this->getBase64EncodedFilePath($name), $length, $flags));
     }
 
     /**
@@ -296,7 +298,7 @@ class ZipArchive64 extends ZipArchive
      */
     public function setCommentName($name, $comment)
     {
-        return ErrorMessages::assert(parent::setCommentName($this->getBase64EncodedFilePath($name), $comment));
+        return ErrorMessages::assert($name, parent::setCommentName($this->getBase64EncodedFilePath($name), $comment));
     }
 
     /**
@@ -355,7 +357,7 @@ class ZipArchive64 extends ZipArchive
      */
     public function close()
     {
-        return ErrorMessages::assert(parent::close());
+        return ErrorMessages::assert($this->currentFile, parent::close());
     }
 
     /**
@@ -365,7 +367,7 @@ class ZipArchive64 extends ZipArchive
      */
     public function unchangeName($name)
     {
-        return ErrorMessages::assert(parent::unchangeName($this->getBase64EncodedFilePath($name)));
+        return ErrorMessages::assert($name, parent::unchangeName($this->getBase64EncodedFilePath($name)));
     }
 
     /**

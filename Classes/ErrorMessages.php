@@ -44,7 +44,7 @@ class ErrorMessages
     ];
 
     /**
-     * @param stgring $filename
+     * @param string $filename
      * @param mixed $result
      *
      * @return mixed
