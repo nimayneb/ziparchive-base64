@@ -67,12 +67,12 @@ class ErrorMessages
      */
     protected static function message($filename, $code)
     {
-        $code = sprintf('An unknown error (%u) has occurred for file <%s>', $code, $filename);
+        $message = sprintf('An unknown error (%u) has occurred for file <%s>', $code, $filename);
 
-        if (true === isset(static::$messages[(integer) $code])) {
-            $code = static::$messages[(integer) $code];
+        if (true === isset(static::$messages[$code])) {
+            $message = static::$messages[$code];
         }
 
-        return sprintf('%s for file <%s>', $code, $filename);
+        return sprintf('%s for file <%s>', $message, $filename);
     }
 }
