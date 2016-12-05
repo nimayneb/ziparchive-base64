@@ -400,7 +400,6 @@ class ZipArchive64 extends ZipArchive
             }
         }
 
-
         return $value;
     }
 }
