@@ -260,11 +260,13 @@ class ZipArchive64 extends ZipArchive
 
             $info = $this->statName($decodedFileName);
 
-            if ((false === empty($info['mtime'])) && (false === filemtime($fixedFile))) {
+
+            if(false === touch($decodedFileName, $info['mtime'])) {
                 throw new InvalidAccessException(
-                    sprintf('Cannot set modified date of file <%s>', $info['name'])
+                    sprintf('Cannot set modified date of file <%s>', $decodedFileName)
                 );
             }
+
         }
 
         return $renamedFiles;
