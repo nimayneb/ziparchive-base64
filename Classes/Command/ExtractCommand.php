@@ -70,7 +70,16 @@ class ExtractCommand extends Command
             exit;
         }
 
-        $zip = new ZipArchive64();
+        $zip = new ZipArchive64(
+            function($output) {
+                echo "{$output}\n";
+            },
+
+            function($error) {
+                file_put_contents('php://stderr', "{$error}\n");
+            }
+        );
+
         if (false === $zip->open($source)) {
             $output->writeln(sprintf('Cannot open <%s>', $source));
             exit;

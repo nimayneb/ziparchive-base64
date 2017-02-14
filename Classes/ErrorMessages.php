@@ -53,7 +53,7 @@ class ErrorMessages
     public static function assert($filename, $result)
     {
         if ((true === is_integer($result)) && (0 < $result)) {
-            throw new Exception(static::message($filename, $result));
+            throw new AssertionException(static::message($filename, $result));
         }
 
         return $result;

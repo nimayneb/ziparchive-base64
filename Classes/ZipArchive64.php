@@ -26,11 +26,12 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  ************************************************************************************/
 
-use Exception;
+use Closure;
 use ZipArchive;
 
 /**
- *
+ * @method errorHandler(string $message) : bool
+ * @method outputHandler(string $message) : void
  */
 class ZipArchive64 extends ZipArchive
 {
@@ -41,10 +42,30 @@ class ZipArchive64 extends ZipArchive
     protected $currentFile;
 
     /**
+     * @var Closure
+     */
+    protected $outputHandler = null;
+
+    /**
+     * @var Closure
+     */
+    protected $errorHandler = null;
+
+    /**
+     * @param Closure $outputHandler
+     * @param Closure $errorHandler
+     */
+    public function __construct(Closure $outputHandler = null, Closure $errorHandler = null)
+    {
+        $this->outputHandler = $outputHandler;
+        $this->errorHandler = $errorHandler;
+    }
+
+    /**
      * @param string $filename
      * @param string $flags
      *
-     * @throws Exception
+     * @throws InvalidArgumentException
      * @return mixed
      */
     public function open($filename, $flags = null)
@@ -53,7 +74,7 @@ class ZipArchive64 extends ZipArchive
 
         $path = realpath(dirname($filename));
         if ((true === empty($path)) || (false === is_dir($path))) {
-            throw new Exception(sprintf('Cannot create zip file in a none directory <%s>', dirname($filename)));
+            throw new InvalidArgumentException(sprintf('Cannot create zip file in a none directory <%s>', dirname($filename)));
         }
 
         $filename = sprintf('%s/%s', $path, basename($filename));
@@ -133,87 +154,153 @@ class ZipArchive64 extends ZipArchive
 
     /**
      * @param string $destination
-     * @param string|array $entries
-     * @return bool
-     * @throws Exception
+     *
+     * @return array
+     * @throws InvalidAccessException
+     * @throws InvalidArchiveException
      */
-    public function extractTo($destination, $entries = null)
+    protected function extractFiles($destination)
     {
-        $this->fixEntries($entries);
-
         $extractedFiles = [];
 
         for ($i = 0; $i < $this->numFiles; $i++) {
             $encodedFileName = $this->getNameIndex($i);
 
             $result = ErrorMessages::assert($encodedFileName, parent::extractTo($destination, $encodedFileName));
+            $this->output(sprintf('Extracting file <%s>...', $encodedFileName));
 
             if (false === $result) {
-                return $this->errorHandler(
-                    sprintf('Unable to extract zip file <%s>!' . $this->currentFile)
+                throw new InvalidArchiveException(
+                    sprintf('Unable to extract zip file <%s>!', $this->currentFile)
                 );
             }
 
             $extractedFiles[] = $encodedFileName;
         }
 
+        return $extractedFiles;
+    }
+
+    /**
+     * @param string $checkFilePath
+     * @param array $oldPaths
+     * @param array $newPaths
+     *
+     * @return bool|string
+     * @throws InvalidAccessException
+     * @throws InvalidArchiveException
+     */
+    protected function fixFolders($checkFilePath, array $oldPaths, array $newPaths)
+    {
+        foreach ($oldPaths as $index => $path) {
+            $newPath = $newPaths[$index];
+
+            $resultOldName = str_replace('\\', '/', sprintf('%s/%s', $checkFilePath, $path));
+            $resultNewName = str_replace('\\', '/', sprintf('%s/%s', $checkFilePath, $newPath));
+
+            if (true === is_dir($resultOldName)) {
+                if ('..' === $resultNewName) {
+                    throw new InvalidArchiveException(
+                        'Broken ZipArchive! You cannot rename to <parent path> (symbolic link).'
+                    );
+                }
+
+                if ('.' === $resultNewName) {
+                    throw new InvalidArchiveException(
+                        'Broken ZipArchive! You cannot rename to <current path> (symbolic link).'
+                    );
+                }
+
+                if (false === rename($resultOldName, $resultNewName)) {
+                    throw new InvalidAccessException(
+                        sprintf('Cannot rename directory <%s> to <%s>', $path, $newPaths[$index])
+                    );
+                }
+            } elseif (true === is_file($resultOldName)) {
+                if ((true === is_file($resultNewName)) && (false === unlink($resultNewName))) {
+                    throw new InvalidAccessException(
+                        sprintf('Cannot overwrite file <%s>!', $newPaths[$index])
+                    );
+                }
+
+                if (false === rename($resultOldName, $resultNewName)) {
+                    throw new InvalidAccessException(
+                        sprintf('Cannot rename file <%s> to <%s>', $path, $newPaths[$index])
+                    );
+                }
+            }
+
+            $checkFilePath = $resultNewName;
+        }
+
+        return $checkFilePath;
+    }
+
+    /**
+     * @param string $destination
+     * @param array $extractedFiles
+     *
+     * @return array
+     * @throws InvalidAccessException
+     */
+    protected function renameFiles($destination, array $extractedFiles)
+    {
         $renamedFiles = [];
 
         foreach ($extractedFiles as $encodedFileName) {
             $decodedFileName = $this->getBase64DecodedFilePath($encodedFileName);
+
             $oldPaths = explode('/', $encodedFileName);
             $newPaths = explode('/', $decodedFileName);
-            $checkPath = $destination;
+            $checkFilePath = $destination;
 
-            foreach ($oldPaths as $index => $path) {
-                $newPath = $newPaths[$index];
+            $this->output(sprintf('Renaming to <%s>...', $decodedFileName));
 
-                $resultOldName = sprintf('%s/%s', $checkPath, $path);
-                $resultNewName = sprintf('%s/%s', $checkPath, $newPath);
+            $renamedFiles[] = $fixedFile = $this->fixFolders($checkFilePath, $oldPaths, $newPaths);
 
-                if (true === is_dir($resultOldName)) {
-                    if ('..' === $resultNewName) {
-                        throw new Exception('Broken ZipArchive! You cannot rename to <parent path> symbolic link.');
-                    }
+            $info = $this->statName($decodedFileName);
 
-                    if ('.' === $resultNewName) {
-                        throw new Exception('Broken ZipArchive! You cannot rename to <current path> symbolic link.');
-                    }
-
-                    if (false === rename($resultOldName, $resultNewName)) {
-                        return $this->errorHandler(
-                            sprintf('Cannot rename directory <%s> to <%s>', $path, $newPaths[$index])
-                        );
-                    }
-                } elseif (true === is_file($resultOldName)) {
-                    if (true === is_file($resultNewName)) {
-                        if (false === unlink($resultNewName)) {
-                            return $this->errorHandler(
-                                sprintf('Cannot overwrite file <%s>!', $newPaths[$index])
-                            );
-                        }
-                    }
-
-                    if (false === rename($resultOldName, $resultNewName)) {
-                        return $this->errorHandler(
-                            sprintf('Cannot rename file <%s> to <%s>', $path, $newPaths[$index])
-                        );
-                    }
-                }
-
-                $checkPath = $resultNewName;
+            if ((false === empty($info['mtime'])) && (false === filemtime($fixedFile))) {
+                throw new InvalidAccessException(
+                    sprintf('Cannot set modified date of file <%s>', $info['name'])
+                );
             }
-
-            $renamedFiles[] = $checkPath;
         }
 
+        return $renamedFiles;
+    }
+
+    /**
+     * @param string $destination
+     * @param string|array $entries
+     * @return bool
+     * @throws InvalidArchiveException
+     */
+    public function extractTo($destination, $entries = null)
+    {
+        $this->fixEntries($entries);
+        $extractedFiles = $this->extractFiles($destination);
+        $renamedFiles = $this->renameFiles($destination, $extractedFiles);
+
         if (count($extractedFiles) !== count($renamedFiles)) {
-            return $this->errorHandler(
+            throw new InvalidArchiveException(
                 sprintf('Incompleted renaming files and paths from zip file <%s>!', $this->currentFile)
             );
         }
 
         return true;
+    }
+
+    /**
+     * @param string $output
+     *
+     * @return void
+     */
+    protected function output($output)
+    {
+        if (null !== $this->outputHandler) {
+            $this->outputHandler($output);
+        }
     }
 
     /**
@@ -233,15 +320,15 @@ class ZipArchive64 extends ZipArchive
     }
 
     /**
-     * @param $message
+     * @param string $error
      *
-     * @return bool
+     * @return void
      */
-    protected function errorHandler($message)
+    protected function error($error)
     {
-        error_log($message, 0);
-
-        return false;
+        if (null !== $this->errorHandler) {
+            $this->errorHandler($error);
+        }
     }
 
     /**
