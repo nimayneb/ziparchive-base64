@@ -26,9 +26,9 @@ class ErrorMessages
         ZipArchive64::ER_WRITE => 'Write error',
         ZipArchive64::ER_CRC => 'CRC error',
         ZipArchive64::ER_ZIPCLOSED => 'Containing zip archive was closed',
-        ZipArchive64::ER_NOENT => 'No such file',
+        ZipArchive64::ER_NOENT => 'No such',
         ZipArchive64::ER_EXISTS => 'File already exists',
-        ZipArchive64::ER_OPEN => 'Can\'t open file',
+        ZipArchive64::ER_OPEN => 'Cannot open',
         ZipArchive64::ER_TMPOPEN => 'Failure to create temporary file',
         ZipArchive64::ER_ZLIB => 'Zlib error',
         ZipArchive64::ER_MEMORY => 'Malloc failure',
@@ -39,7 +39,7 @@ class ErrorMessages
         ZipArchive64::ER_NOZIP => 'Not a zip archive',
         ZipArchive64::ER_INTERNAL => 'Internal error',
         ZipArchive64::ER_INCONS => 'Zip archive inconsistent',
-        ZipArchive64::ER_REMOVE => 'Can\'t remove file',
+        ZipArchive64::ER_REMOVE => 'Cannot remove',
         ZipArchive64::ER_DELETED => 'Entry has been deleted',
     ];
 

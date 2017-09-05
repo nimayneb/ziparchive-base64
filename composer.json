@@ -4,7 +4,7 @@
   "keywords": [ "ziparchive", "zip", "base64", "utf8", "utf-8", "unicode"],
   "homepage": "https://github.com/nimayneb/ziparchive-base64",
   "license": "BSD-3-Clause",
-  "version": "1.2.1",
+  "version": "1.3.0",
   
   "minimum-stability": "dev",
 

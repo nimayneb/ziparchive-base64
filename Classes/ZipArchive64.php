@@ -35,7 +35,6 @@ use ZipArchive;
  */
 class ZipArchive64 extends ZipArchive
 {
-
     /**
      * @var string
      */
@@ -256,7 +255,7 @@ class ZipArchive64 extends ZipArchive
 
             $this->output(sprintf('Renaming to <%s>...', $decodedFileName));
 
-            $renamedFiles[] = $fixedFile = $this->fixFolders($checkFilePath, $oldPaths, $newPaths);
+            $renamedFiles[] = $this->fixFolders($checkFilePath, $oldPaths, $newPaths);
 
             $info = $this->statName($decodedFileName);
 
@@ -301,7 +300,8 @@ class ZipArchive64 extends ZipArchive
     protected function output($output)
     {
         if (null !== $this->outputHandler) {
-            $this->outputHandler($output);
+            $outputHandler = $this->outputHandler;
+            $outputHandler($output);
         }
     }
 
@@ -329,7 +329,8 @@ class ZipArchive64 extends ZipArchive
     protected function error($error)
     {
         if (null !== $this->errorHandler) {
-            $this->errorHandler($error);
+            $errorHandler = $this->errorHandler;
+            $errorHandler($error);
         }
     }
 

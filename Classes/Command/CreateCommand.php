@@ -27,6 +27,7 @@
  ************************************************************************************/
 
 use DirectoryIterator;
+use Iterator;
 use JBR\ZipArchive64\ZipArchive64;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
@@ -77,18 +78,30 @@ class CreateCommand extends Command
             exit;
         }
 
-        $zip = new ZipArchive64();
+        $recursive = $input->getOption('recursive');
+        $directory = $this->getDirectoryIterator($source, (false === empty($recursive)));
+
+        $zip = new ZipArchive64(
+            function($output) {
+                echo "{$output}\n";
+            },
+
+            function($error) {
+                file_put_contents('php://stderr', "{$error}\n");
+            }
+        );
+
         $update = $input->getOption('update');
+
         if (false === $zip->open($target, $this->getArchiveMode($update))) {
             $output->writeln(sprintf('Cannot open <%s>', $source));
             exit;
         }
 
-        $recursive = $input->getOption('recursive');
-        $directory = $this->getDirectoryIterator($source, (false === empty($recursive)));
-
+        $verbose = $input->getOption('verbose');
         $i = 0;
-        foreach ($directory as $fileInfo/** @var SplFileInfo $fileInfo */) {
+
+        foreach ($directory as $fileInfo) {
             if (true === $fileInfo->isDir()) {
                 continue;
             }
@@ -98,7 +111,6 @@ class CreateCommand extends Command
             $truncate = $input->getOption('truncate');
             $localName = $this->getLocalName($file, (false === empty($truncate)));
 
-            $verbose = $input->getOption('verbose');
             if (false === empty($verbose)) {
                 $output->writeln(sprintf('<%s> Add "%s"', str_pad($i, 4, '0', STR_PAD_LEFT), $localName));
             }
@@ -119,10 +131,10 @@ class CreateCommand extends Command
      */
     private function getArchiveMode($update)
     {
-        $option = ZipArchive64::OVERWRITE;
+        $option = ZipArchive64::CREATE;
 
         if (true === $update) {
-            $option = ZipArchive64::CREATE;
+            $option = ZipArchive64::EXCL;
         }
 
         return $option;
@@ -132,7 +144,7 @@ class CreateCommand extends Command
      * @param string $source
      * @param bool $recursive
      *
-     * @return DirectoryIterator
+     * @return SplFileInfo[]|Iterator
      */
     protected function getDirectoryIterator($source, $recursive = false)
     {
@@ -147,7 +159,7 @@ class CreateCommand extends Command
 
     /**
      * @param string $file
-     * @param boolean $input
+     * @param boolean $truncate
      *
      * @return string
      */

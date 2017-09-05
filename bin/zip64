@@ -5,7 +5,7 @@ if ('cli' !== PHP_SAPI) {
     echo sprintf("Warning: Zip64 should be invoked via the CLI version of PHP, not the %s SAPI\n\n", PHP_SAPI);
 }
 
-require_once __DIR__ . '/../Classes/bootstrap.php';
+require_once __DIR__ . '/../bootstrap.php';
 
 use \JBR\ZipArchive64\Console\Application;
 
