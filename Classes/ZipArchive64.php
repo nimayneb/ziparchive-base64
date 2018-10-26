@@ -65,6 +65,7 @@ class ZipArchive64 extends ZipArchive
      * @param string $flags
      *
      * @throws InvalidArgumentException
+     * @throws \Exception
      * @return mixed
      */
     public function open($filename, $flags = null)
@@ -85,6 +86,7 @@ class ZipArchive64 extends ZipArchive
      * @param string $dirname
      *
      * @return bool
+     * @throws \Exception
      */
     public function addEmptyDir($dirname)
     {
@@ -96,7 +98,7 @@ class ZipArchive64 extends ZipArchive
      *
      * @return string
      */
-    protected function getBase64EncodedFilePath($reference)
+    protected function getBase64EncodedFilePath(string $reference): string
     {
         return $this->translateFilePath($reference, 'getEncodedBase64');
     }
@@ -107,7 +109,7 @@ class ZipArchive64 extends ZipArchive
      *
      * @return string
      */
-    protected function translateFilePath($reference, $method)
+    protected function translateFilePath(string $reference, string $method): string
     {
         $paths = explode('/', $reference);
         $filePaths = [];
@@ -125,6 +127,7 @@ class ZipArchive64 extends ZipArchive
      * @param string $contents
      *
      * @return bool
+     * @throws \Exception
      */
     public function addFromString($localname, $contents)
     {
@@ -138,6 +141,7 @@ class ZipArchive64 extends ZipArchive
      * @param int $length
      *
      * @return bool
+     * @throws \Exception
      */
     public function addFile($filename, $localname = null, $start = 0, $length = 0)
     {
@@ -155,10 +159,10 @@ class ZipArchive64 extends ZipArchive
      * @param string $destination
      *
      * @return array
-     * @throws InvalidAccessException
      * @throws InvalidArchiveException
+     * @throws \Exception
      */
-    protected function extractFiles($destination)
+    protected function extractFiles(string $destination): array
     {
         $extractedFiles = [];
 
@@ -185,11 +189,11 @@ class ZipArchive64 extends ZipArchive
      * @param array $oldPaths
      * @param array $newPaths
      *
-     * @return bool|string
+     * @return string
      * @throws InvalidAccessException
      * @throws InvalidArchiveException
      */
-    protected function fixFolders($checkFilePath, array $oldPaths, array $newPaths)
+    protected function fixFolders(string $checkFilePath, array $oldPaths, array $newPaths): string
     {
         foreach ($oldPaths as $index => $path) {
             $newPath = $newPaths[$index];
@@ -241,8 +245,9 @@ class ZipArchive64 extends ZipArchive
      *
      * @return array
      * @throws InvalidAccessException
+     * @throws InvalidArchiveException
      */
-    protected function renameFiles($destination, array $extractedFiles)
+    protected function renameFiles(string $destination, array $extractedFiles): array
     {
         $renamedFiles = [];
 
@@ -276,6 +281,7 @@ class ZipArchive64 extends ZipArchive
      * @param string|array $entries
      * @return bool
      * @throws InvalidArchiveException
+     * @throws InvalidAccessException
      */
     public function extractTo($destination, $entries = null)
     {
@@ -297,12 +303,9 @@ class ZipArchive64 extends ZipArchive
      *
      * @return void
      */
-    protected function output($output)
+    protected function output(string $output): void
     {
-        if (null !== $this->outputHandler) {
-            $outputHandler = $this->outputHandler;
-            $outputHandler($output);
-        }
+        empty($this->outputHandler)?:($this->outputHandler)($output);
     }
 
     /**
@@ -310,7 +313,7 @@ class ZipArchive64 extends ZipArchive
      *
      * @return void
      */
-    protected function fixEntries(&$entries)
+    protected function fixEntries(&$entries): void
     {
         if (true === is_array($entries)) {
             foreach ($entries as $key => $value) {
@@ -326,12 +329,9 @@ class ZipArchive64 extends ZipArchive
      *
      * @return void
      */
-    protected function error($error)
+    protected function error(string $error): void
     {
-        if (null !== $this->errorHandler) {
-            $errorHandler = $this->errorHandler;
-            $errorHandler($error);
-        }
+        empty($this->errorHandler)?:($this->errorHandler)($error);
     }
 
     /**
@@ -339,7 +339,7 @@ class ZipArchive64 extends ZipArchive
      *
      * @return string
      */
-    protected function getBase64DecodedFilePath($reference)
+    protected function getBase64DecodedFilePath(string $reference): string
     {
         return $this->translateFilePath($reference, 'getDecodedBase64');
     }
@@ -349,6 +349,7 @@ class ZipArchive64 extends ZipArchive
      * @param string $newname
      *
      * @return bool
+     * @throws \Exception
      */
     public function renameName($name, $newname)
     {
@@ -362,6 +363,7 @@ class ZipArchive64 extends ZipArchive
      * @param string $name
      *
      * @return bool
+     * @throws \Exception
      */
     public function deleteName($name)
     {
@@ -374,6 +376,7 @@ class ZipArchive64 extends ZipArchive
      * @param string $flags
      *
      * @return string
+     * @throws \Exception
      */
     public function getFromName($name, $length = 0, $flags = null)
     {
@@ -385,6 +388,7 @@ class ZipArchive64 extends ZipArchive
      * @param string $comment
      *
      * @return bool
+     * @throws \Exception
      */
     public function setCommentName($name, $comment)
     {
@@ -421,7 +425,7 @@ class ZipArchive64 extends ZipArchive
      *
      * @return void
      */
-    protected function fixStats(array &$result)
+    protected function fixStats(array &$result): void
     {
         if (true === isset($result['name'])) {
             $result['name'] = $this->getBase64EncodedFilePath($result['name']);
@@ -444,6 +448,7 @@ class ZipArchive64 extends ZipArchive
 
     /**
      * @return bool
+     * @throws \Exception
      */
     public function close()
     {
@@ -454,6 +459,7 @@ class ZipArchive64 extends ZipArchive
      * @param string $name
      *
      * @return bool
+     * @throws \Exception
      */
     public function unchangeName($name)
     {
@@ -465,7 +471,7 @@ class ZipArchive64 extends ZipArchive
      *
      * @return string
      */
-    protected function getEncodedBase64($value)
+    protected function getEncodedBase64(string $value): string
     {
         return sprintf(
             '%s#%s',
@@ -479,7 +485,7 @@ class ZipArchive64 extends ZipArchive
      *
      * @return string
      */
-    protected function getDecodedBase64($value)
+    protected function getDecodedBase64(string $value): string
     {
         if (false !== strpos($value, '#')) {
             list($hash, $encodedName) = explode('#', $value);

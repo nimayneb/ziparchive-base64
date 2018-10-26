@@ -50,7 +50,7 @@ class ErrorMessages
      * @return mixed
      * @throws Exception
      */
-    public static function assert($filename, $result)
+    public static function assert(string $filename, $result)
     {
         if ((true === is_integer($result)) && (0 < $result)) {
             throw new AssertionException(static::message($filename, $result));
@@ -65,7 +65,7 @@ class ErrorMessages
      *
      * @return string
      */
-    protected static function message($filename, $code)
+    protected static function message(string $filename, int $code): string
     {
         $message = sprintf('An unknown error (%u) has occurred for file <%s>', $code, $filename);
 

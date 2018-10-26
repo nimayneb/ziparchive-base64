@@ -27,17 +27,24 @@
  ************************************************************************************/
 
 use JBR\ZipArchive64\ZipArchive64;
+use PHPUnit\Framework\TestCase;
 
 /**
  *
  */
-class ZipArchive64Test extends PHPUnit_Framework_TestCase
+class ZipArchive64Test extends TestCase
 {
 
+    /**
+     * @throws \JBR\ZipArchive64\InvalidAccessException
+     * @throws \JBR\ZipArchive64\InvalidArchiveException
+     * @throws \JBR\ZipArchive64\InvalidArgumentException
+     * @throws Exception
+     */
     public function testCreateZipArchive()
     {
         $zip = new ZipArchive64();
-        $zip->open('Tests/res/test.zip', ZipArchive::OVERWRITE);
+        $zip->open('Tests/res/test.zip', ZipArchive::CREATE);
 
         foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator('Tests/res/example')) as $filename) {
             if (true === $filename->isDir()) {

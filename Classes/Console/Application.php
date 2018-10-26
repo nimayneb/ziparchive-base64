@@ -42,16 +42,16 @@ class Application extends BaseApplication
      * @param string $name
      * @param string $version
      */
-    public function __construct($name = 'UNKNOWN', $version = 'UNKNOWN')
+    public function __construct(string $name = 'UNKNOWN', string $version = 'UNKNOWN')
     {
         $composer = json_decode(file_get_contents(__DIR__ . '/../../composer.json'), true);
         parent::__construct('zip64', $composer['version']);
     }
 
     /**
-     * @return array|\Symfony\Component\Console\Command\Command[]
+     * @return \Symfony\Component\Console\Command\Command[]
      */
-    protected function getDefaultCommands()
+    protected function getDefaultCommands(): array
     {
         $commands = parent::getDefaultCommands();
         $commands[] = new CreateCommand();

@@ -4,11 +4,15 @@
  *
  * @param string $file
  *
- * @return bool
+ * @return bool|mixed
  */
-function includeFileIfExists($file)
+function includeFileIfExists(string $file)
 {
-    return (true === file_exists($file)) ? include_once $file : false;
+    if (true === file_exists($file)) {
+        return include_once $file;
+    } else {
+        return false;
+    }
 }
 
 if (false === ($autoload = includeFileIfExists(sprintf('%s/vendor/autoload.php', __DIR__)))) {

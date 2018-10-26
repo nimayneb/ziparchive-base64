@@ -4,7 +4,7 @@
   "keywords": [ "ziparchive", "zip", "base64", "utf8", "utf-8", "unicode"],
   "homepage": "https://github.com/nimayneb/ziparchive-base64",
   "license": "BSD-3-Clause",
-  "version": "1.3.0",
+  "version": "1.4.0",
   
   "minimum-stability": "dev",
 
@@ -17,12 +17,14 @@
   ],
 
   "require": {
-    "php": ">5.4.10",
-    "symfony/console": "^2.7 || ^3.0"
+    "php": "^7.1",
+    "symfony/console": "^2.7 || ^3.0 || ^4.0 || ^4.1",
+    "ext-zip": "*",
+    "ext-json": "*"
   },
 
   "require-dev": {
-    "phpunit/phpunit": "4.8.*"
+    "phpunit/phpunit": "^7.4.3"
   },
 
   "autoload": {

@@ -51,8 +51,10 @@ class CreateCommand extends Command
      * @param OutputInterface $output
      *
      * @return int|null|void
+     * @throws \JBR\ZipArchive64\InvalidArgumentException
+     * @throws \Exception
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output):void
     {
         $source = $input->getArgument('source');
 
@@ -129,7 +131,7 @@ class CreateCommand extends Command
      *
      * @return integer
      */
-    private function getArchiveMode($update)
+    private function getArchiveMode($update):int
     {
         $option = ZipArchive64::CREATE;
 
@@ -163,7 +165,7 @@ class CreateCommand extends Command
      *
      * @return string
      */
-    protected function getLocalName($file, $truncate = false)
+    protected function getLocalName($file, $truncate = false): string
     {
         if (true === $truncate) {
             $file = str_replace(getcwd(), '', $file);
@@ -175,7 +177,7 @@ class CreateCommand extends Command
     /**
      *
      */
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setName('create')

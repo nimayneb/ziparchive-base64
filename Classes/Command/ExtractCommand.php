@@ -42,9 +42,13 @@ class ExtractCommand extends Command
      * @param InputInterface $input
      * @param OutputInterface $output
      *
-     * @return int|null|void
+     * @return void
+     * @throws \JBR\ZipArchive64\InvalidAccessException
+     * @throws \JBR\ZipArchive64\InvalidArchiveException
+     * @throws \JBR\ZipArchive64\InvalidArgumentException
+     * @throws \Exception
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): void
     {
         $source = $input->getArgument('source');
 
@@ -96,7 +100,7 @@ class ExtractCommand extends Command
     /**
      *
      */
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setName('extract')
